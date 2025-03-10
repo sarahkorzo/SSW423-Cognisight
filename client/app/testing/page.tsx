@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button"; 
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react"; // Importing the ArrowLeft icon
 
 export default function TestingPage() {
   const [patientData, setPatientData] = useState<any>(null);
@@ -38,8 +39,16 @@ export default function TestingPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="container mx-auto px-4 py-8">
-        <header className="grid grid-cols-3 items-center mb-12">
+        <header className="flex items-center justify-between mb-12">
+          {/* Back button */}
+          <Button variant="ghost" size="icon" asChild>
+            <Link href="/dashboard">
+              <ArrowLeft className="h-6 w-6" />
+              <span className="sr-only">Back to Dashboard</span>
+            </Link>
+          </Button>
           <h1 className="text-3xl font-bold text-slate-800 text-center">Concussion Test Results</h1>
+          <div className="w-6" />
         </header>
 
         <div className="max-w-4xl mx-auto">
@@ -49,6 +58,15 @@ export default function TestingPage() {
             <p><strong>Stutter Count:</strong> {patientData.stutter_count}</p>
             <p><strong>Concussion Likelihood:</strong> {patientData.concussion_likelihood}</p>
             <p><strong>Recommendation:</strong> {patientData.recommendation}</p>
+          </div>
+
+          {/* Button to go back to the dashboard */}
+          <div className="mt-8">
+            <Link href="/dashboard">
+              <Button className="bg-blue-700 text-white hover:bg-blue-800">
+                Back to Dashboard
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

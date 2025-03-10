@@ -6,6 +6,9 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
+# Allow cross-origin requests only from the Next.js app
+CORS(app, origins=["http://localhost:3000"])  # Replace with your frontend URL if different
+
 
 # Function to load eye movement data
 def load_data():
