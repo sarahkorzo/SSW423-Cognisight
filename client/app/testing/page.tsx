@@ -66,14 +66,14 @@ export default function TestingPage() {
             <img src="/scatter_plot.png" alt="Scatter Plot" className="max-w-full h-auto mt-4" />
           </div>
 
-          {/* Button to go back to the dashboard */}
+          {/* Button to go to symtoms page */}
           <div className="mt-8">
-            <Link href="/dashboard">
-              <Button className="bg-blue-700 text-white hover:bg-blue-800">
-                Back to Dashboard
-              </Button>
-            </Link>
-          </div>
+          <Link href="/testing/symptoms" passHref>
+            <Button className="bg-blue-700 text-white hover:bg-blue-800">
+              Continue to Symptoms
+            </Button>
+          </Link>
+        </div>
         </div>
       </div>
     </div>
