@@ -21,7 +21,7 @@ export default function ProfilePage() {
     name: "",
     number: "",
     email: "",
-    emergency: "",
+    password: "",
   })
 
   // Load saved data from localStorage on component mount
@@ -143,11 +143,11 @@ export default function ProfilePage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="emergency">Emergency Contact</Label>
+                <Label htmlFor="password">Update Password</Label>
                 <Input
-                  id="emergency"
-                  placeholder="Enter emergency contact"
-                  value={formData.emergency}
+                  id="password"
+                  placeholder="Enter new password"
+                  value={formData.password}
                   onChange={handleInputChange}
                 />
               </div>
