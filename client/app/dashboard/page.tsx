@@ -26,7 +26,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           <NavigationCard href="/devices" icon={Brain} title="Your Devices" />
           <NavigationCard href="/players" icon={Database} title="Player Database" />
-          <NavigationCard href="/testing" icon={Activity} title="Testing" />
+          <NavigationCard href="/testing/start" icon={Activity} title="Testing" />
           <NavigationCard href="/profile" icon={UserCircle} title="AT Profile" />
         </div>
       </div>
