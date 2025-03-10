@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { ArrowLeft } from "lucide-react"; // Importing the back arrow icon
 
 export default function StartTestingPage() {
   const [playerId, setPlayerId] = useState("");
@@ -34,6 +35,14 @@ export default function StartTestingPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-100">
+      {/* Back to Dashboard Button */}
+      <div className="absolute top-4 left-4">
+        <Button variant="ghost" size="icon" onClick={() => router.push("/dashboard")}>
+          <ArrowLeft className="h-6 w-6" />
+          <span className="sr-only">Back to Dashboard</span>
+        </Button>
+      </div>
+
       {!loading ? (
         <div className="bg-white p-6 rounded-lg shadow-md w-96 text-center">
           <h1 className="text-2xl font-bold text-gray-800 mb-4">Start Testing</h1>
@@ -53,7 +62,9 @@ export default function StartTestingPage() {
           <h1 className="text-xl font-bold text-gray-800 mb-4">Running Test...</h1>
           <Progress value={progress} className="w-full mb-4" />
           <p className="text-gray-600">Please wait while the test runs...</p>
-          <p className="text-black-600">Athlete please move your eyes left and right in front of the device for 30 seconds...</p>
+          <p className="text-black-600">
+            Athlete, please move your eyes left and right in front of the device for 30 seconds...
+          </p>
         </div>
       )}
     </div>

@@ -1,17 +1,32 @@
-import type React from "react"
-import Link from "next/link"
-import { Brain, Database, Activity, UserCircle } from "lucide-react"
-import { Card } from "@/components/ui/card"
+"use client";
+
+import type React from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Brain, Database, Activity, UserCircle, LogOut } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export default function DashboardPage() {
+  const router = useRouter();
+
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="container mx-auto px-4 py-8">
-        {/* Header - No back button since this is the main dashboard */}
-        <header className="flex items-center justify-between mb-12">
-          <div className="w-6" />
-          <h1 className="text-3xl font-bold text-slate-800">Cognisight</h1>
-          <div className="w-6" />
+        {/* Header */}
+        <header className="flex items-center justify-between mb-12 relative">
+          {/* Logout Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.push("/login")}
+            className="absolute left-0 top-0 mt-2 ml-2"
+          >
+            <LogOut className="h-6 w-6 text-red-600" />
+            <span className="sr-only">Logout</span>
+          </Button>
+
+          <h1 className="text-3xl font-bold text-slate-800 text-center w-full">Cognisight</h1>
         </header>
 
         {/* Hero Section */}
@@ -31,7 +46,7 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function NavigationCard({
@@ -39,9 +54,9 @@ function NavigationCard({
   icon: Icon,
   title,
 }: {
-  href: string
-  icon: React.ElementType
-  title: string
+  href: string;
+  icon: React.ElementType;
+  title: string;
 }) {
   return (
     <Card className="group relative overflow-hidden">
@@ -53,6 +68,5 @@ function NavigationCard({
         <h3 className="text-lg font-medium text-slate-700 group-hover:text-slate-900 transition-colors">{title}</h3>
       </Link>
     </Card>
-  )
+  );
 }
-
