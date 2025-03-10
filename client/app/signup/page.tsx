@@ -19,9 +19,9 @@ export default function SignUpPage() {
   const [imageUrl, setImageUrl] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     name: "",
-    position: "",
-    email: "",
     number: "",
+    email: "",
+    password: "",
   })
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,12 +98,12 @@ export default function SignUpPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="position">Position</Label>
+                <Label htmlFor="number">Phone Number</Label>
                 <Input
-                  id="position"
-                  placeholder="Enter your position"
-                  value={formData.position}
-                  onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                  id="number"
+                  placeholder="Enter your number"
+                  value={formData.number}
+                  onChange={(e) => setFormData({ ...formData, number: e.target.value })}
                   required
                 />
               </div>
@@ -122,13 +122,13 @@ export default function SignUpPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="number">Phone Number</Label>
+              <Label htmlFor="password">Password</Label>
               <Input
-                id="number"
+                id="password"
                 type="tel"
-                placeholder="Enter your phone number"
+                placeholder="Enter your password"
                 value={formData.number}
-                onChange={(e) => setFormData({ ...formData, number: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
               />
             </div>
