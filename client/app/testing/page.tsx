@@ -60,6 +60,12 @@ export default function TestingPage() {
             <p><strong>Recommendation:</strong> {patientData.recommendation}</p>
           </div>
 
+          {/* Display the scatter plot image */}
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold">Scatter Plot</h3>
+            <img src="/scatter_plot.png" alt="Scatter Plot" className="max-w-full h-auto mt-4" />
+          </div>
+
           {/* Button to go back to the dashboard */}
           <div className="mt-8">
             <Link href="/dashboard">
