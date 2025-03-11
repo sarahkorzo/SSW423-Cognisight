@@ -127,7 +127,7 @@ export default function SignUpPage() {
                 id="password"
                 type="tel"
                 placeholder="Enter your password"
-                value={formData.number}
+                value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
               />
