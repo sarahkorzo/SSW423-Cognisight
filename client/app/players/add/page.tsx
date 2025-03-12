@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -21,9 +20,10 @@ export default function AddPlayerPage() {
 
   const [formData, setFormData] = useState({
     name: "",
+    dob: "",
     age: "",
     team: "",
-    position: "",
+    trainerName: "",
     status: "active",
     height: "",
     weight: "",
@@ -31,6 +31,11 @@ export default function AddPlayerPage() {
     phone: "",
     emergency: "",
     medicalNotes: "",
+    mentalHealthReferrals: [],
+    surgicalHistory: [],
+    allergies: [],
+    bloodwork: [],
+    medication: []
   })
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -45,7 +50,7 @@ export default function AddPlayerPage() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    if (!formData.name || !formData.team || !formData.position) {
+    if (!formData.name || !formData.team || !formData.trainerName) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields.",
@@ -61,9 +66,10 @@ export default function AddPlayerPage() {
     const newPlayer: Player = {
       id: `user_${Date.now()}`, // Generate a unique ID
       name: formData.name,
+      dob: formData.dob,
       age: Number.parseInt(formData.age) || 0,
       team: formData.team,
-      position: formData.position,
+      trainerName: formData.trainerName,
       status: formData.status as "active" | "injured" | "concussion" | "recovery",
       height: formData.height || "Not specified",
       weight: formData.weight || "Not specified",
@@ -82,6 +88,11 @@ export default function AddPlayerPage() {
         phone: formData.phone || "Not provided",
         emergency: formData.emergency || "Not provided",
       },
+      mentalHealthReferrals: formData.mentalHealthReferrals,
+      surgicalHistory: formData.surgicalHistory,
+      allergies: formData.allergies,
+      bloodwork: formData.bloodwork,
+      medication: formData.medication,
     }
 
     // Get existing user-added players or initialize empty array
@@ -138,6 +149,16 @@ export default function AddPlayerPage() {
                     />
                   </div>
                   <div className="space-y-2">
+                    <Label htmlFor="dob">Date of Birth *</Label>
+                    <Input
+                      id="dob"
+                      placeholder="yyyy-mm-dd"
+                      value={formData.dob}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
                     <Label htmlFor="age">Age *</Label>
                     <Input
                       id="age"
@@ -159,11 +180,11 @@ export default function AddPlayerPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="position">Position *</Label>
+                    <Label htmlFor="trainerName">Trainer Name *</Label>
                     <Input
-                      id="position"
-                      placeholder="Enter player's position"
-                      value={formData.position}
+                      id="trainerName"
+                      placeholder="Enter player's team trainer"
+                      value={formData.trainerName}
                       onChange={handleInputChange}
                       required
                     />
@@ -251,6 +272,7 @@ export default function AddPlayerPage() {
                     onChange={handleInputChange}
                   />
                 </div>
+                {/* Additional fields can be added here for mentalHealthReferrals, surgicalHistory, allergies, bloodwork, and medication */}
               </div>
 
               <div className="flex justify-end space-x-4 pt-4">
@@ -269,4 +291,3 @@ export default function AddPlayerPage() {
     </div>
   )
 }
-

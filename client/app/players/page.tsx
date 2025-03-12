@@ -33,7 +33,7 @@ export default function PlayerDatabasePage() {
     (player) =>
       player.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       player.team.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      player.position.toLowerCase().includes(searchQuery.toLowerCase()),
+      player.trainerName.toLowerCase().includes(searchQuery.toLowerCase()),
   )
 
   return (
@@ -65,7 +65,7 @@ export default function PlayerDatabasePage() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
             <Input
               type="text"
-              placeholder="Search players by name, team, or position..."
+              placeholder="Search players by name, team, or trainer name..."
               className="pl-10 py-6 text-lg"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -95,7 +95,7 @@ export default function PlayerDatabasePage() {
                       <div>
                         <h3 className="text-lg font-medium">{player.name}</h3>
                         <p className="text-slate-500">
-                          {player.team} • {player.position}
+                          {player.team} • {player.trainerName}
                         </p>
                       </div>
                       <div className="flex items-center gap-3">

@@ -248,13 +248,13 @@ export default function PlayerProfilePage({ params }: { params: { id: string } }
                         <Input id="team" value={editedPlayer.team} onChange={handleInputChange} />
                       </div>
                       <div>
-                        <Label htmlFor="position">Position</Label>
-                        <Input id="position" value={editedPlayer.position} onChange={handleInputChange} />
+                        <Label htmlFor="trainerName">Trainer Name</Label>
+                        <Input id="trainerName" value={editedPlayer.trainerName} onChange={handleInputChange} />
                       </div>
                     </div>
                   ) : (
                     <CardDescription className="text-lg">
-                      {player.team} • {player.position}
+                      {player.team} • {player.trainerName}
                     </CardDescription>
                   )}
                 </div>
@@ -285,6 +285,14 @@ export default function PlayerProfilePage({ params }: { params: { id: string } }
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-2">
+              <div>
+                  <p className="text-sm text-slate-500">Date of Birth</p>
+                  {isEditing ? (
+                    <Input id="dob" type="number" value={editedPlayer.dob} onChange={handleInputChange} />
+                  ) : (
+                    <p className="font-medium">{player.dob}</p>
+                  )}
+                </div>
                 <div>
                   <p className="text-sm text-slate-500">Age</p>
                   {isEditing ? (
