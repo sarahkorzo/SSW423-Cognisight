@@ -122,16 +122,17 @@ export default function PlayerDatabasePage() {
 // Status Badge Component
 function StatusBadge({ status }: { status: "active" | "injured" | "concussion" | "recovery" }) {
   const statusConfig = {
-    active: { label: "Active", variant: "outline" as const },
-    injured: { label: "Injured", variant: "destructive" as const },
-    concussion: { label: "Concussion", variant: "destructive" as const },
-    recovery: { label: "Recovery", variant: "secondary" as const },
-  }
+    active: { label: "Active", className: "bg-green-500 text-white" }, // Green
+    injured: { label: "Injured", className: "bg-red-500 text-white" }, // Red
+    concussion: { label: "Concussion", className: "bg-red-500 text-white" }, // Red
+    recovery: { label: "Recovery", className: "bg-yellow-500 text-white" }, // Yellow
+  };
 
-  const config = statusConfig[status]
+  const config = statusConfig[status];
 
-  return <Badge variant={config.variant}>{config.label}</Badge>
+  return <Badge className={config.className}>{config.label}</Badge>;
 }
+
 
 // Empty State Component
 function EmptyState({ message }: { message: string }) {
