@@ -101,8 +101,8 @@ export default function PlayerDatabasePage() {
                       <div className="flex items-center gap-3">
                         <StatusBadge status={player.status} />
                         <div className="text-right">
-                          <p className="text-sm text-slate-500">Age</p>
-                          <p className="font-medium">{player.age}</p>
+                          <p className="text-sm text-slate-500">DOB</p>
+                          <p className="font-medium">{player.dob}</p>
                         </div>
                       </div>
                     </div>
