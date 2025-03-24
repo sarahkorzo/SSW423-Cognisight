@@ -4,12 +4,15 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft } from "lucide-react"; // Importing the back arrow icon
+import { ArrowLeft } from "lucide-react";
+import { playerData } from "@/app/players/data"; // Import player data
 
 export default function StartTestingPage() {
   const [playerId, setPlayerId] = useState("");
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [showPopup, setShowPopup] = useState(false);
+  const [selectedPlayer, setSelectedPlayer] = useState<any>(null);
   const router = useRouter();
 
   const startTest = () => {
@@ -18,6 +21,20 @@ export default function StartTestingPage() {
       return;
     }
 
+    // Find player by id
+    const matchedPlayer = playerData.find((player) => player.id === playerId.trim());
+    if (!matchedPlayer) {
+      alert("Invalid Player ID. Please try again.");
+      return;
+    }
+
+    // Set player for verification
+    setSelectedPlayer(matchedPlayer);
+    setShowPopup(true);
+  };
+
+  const confirmAndStart = () => {
+    setShowPopup(false);
     setLoading(true);
     let progressValue = 0;
 
@@ -65,6 +82,26 @@ export default function StartTestingPage() {
           <p className="text-black-600">
             Athlete, please move your eyes left and right in front of the device for 30 seconds...
           </p>
+        </div>
+      )}
+
+      {/* Verification Popup */}
+      {showPopup && selectedPlayer && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96 text-center">
+            <h2 className="text-xl font-bold mb-4">Verify Player Information</h2>
+            <p className="text-gray-700 mb-2">Name: {selectedPlayer.name}</p>
+            <p className="text-gray-700 mb-2">Date of Birth: {selectedPlayer.dob}</p>
+            <p className="text-gray-700 mb-4">Team: {selectedPlayer.team}</p>
+            <div className="flex justify-center space-x-4">
+              <Button onClick={confirmAndStart} className="bg-green-600 text-white">
+                Confirm
+              </Button>
+              <Button onClick={() => setShowPopup(false)} className="bg-red-600 text-white">
+                Cancel
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </div>
