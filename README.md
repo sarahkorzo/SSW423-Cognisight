@@ -52,15 +52,15 @@ This is a machine learning-based concussion detection and athletic training soft
 
 This project includes a secure login and registration system for trainers using MongoDB and JSON Web Tokens (JWT). This enables protected access to sensitive features like player directories and concussion results.
 
-### 1. Install Backend Dependencies
-*   Navigate to the `/server` folder.
-*   Run the following command to install required packages:
+*   Install Backend Dependencies
+    Navigate to the `/server` folder.
+    Run the following command to install required packages:
 
     `npm install`
 
-### 2. Create the `.env` File
+*   Create the `.env` File
 
-*   In the `/server` directory, create a `.env` file with the following keys:
+    In the `/server` directory, create a `.env` file with the following keys:
 
     ```
     MONGO_URL=mongodb+srv://<your-username>:<your-password>@<your-cluster>.mongodb.net
@@ -68,15 +68,15 @@ This project includes a secure login and registration system for trainers using 
     JWT_SECRET=your-super-secret-key
     ```
 
-*   You can use the provided `.env.example` file as a reference.
+    You can use the provided `.env.example` file as a reference.
 
-### 3. Run the Backend Server
+*   Run the Backend Server
 
-*   In the `/server` folder, run the following command to start the backend:
+    In the `/server` folder, run the following command to start the backend:
 
     `npm run dev`
 
-*   This will start the Node.js server on `http://localhost:5000`.
+    This will start the Node.js server on `http://localhost:5000`.
 
 These setup steps enable secure login and sign-up functionality using MongoDB and JWT, which will protect access to future features like player data and concussion assessments.
 
