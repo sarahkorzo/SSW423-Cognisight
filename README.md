@@ -46,9 +46,42 @@ This is a machine learning-based concussion detection and athletic training soft
     `npm run dev`
     
     This will start the React app locally on `http://localhost:3000`.
-    
 
-#### 3\. Testing
+    
+#### 3\. User Authentication Backend (Node.js + MongoDB + JWT)
+
+This project includes a secure login and registration system for trainers using MongoDB and JSON Web Tokens (JWT). This enables protected access to sensitive features like player directories and concussion results.
+
+### 1. Install Backend Dependencies
+*   Navigate to the `/server` folder.
+*   Run the following command to install required packages:
+
+    `npm install`
+
+### 2. Create the `.env` File
+
+*   In the `/server` directory, create a `.env` file with the following keys:
+
+    ```
+    MONGO_URL=mongodb+srv://<your-username>:<your-password>@<your-cluster>.mongodb.net
+    MONGO_DB=cognisight
+    JWT_SECRET=your-super-secret-key
+    ```
+
+*   You can use the provided `.env.example` file as a reference.
+
+### 3. Run the Backend Server
+
+*   In the `/server` folder, run the following command to start the backend:
+
+    `npm run dev`
+
+*   This will start the Node.js server on `http://localhost:5000`.
+
+These setup steps enable secure login and sign-up functionality using MongoDB and JWT, which will protect access to future features like player data and concussion assessments.
+
+
+#### 4\. Testing
 
 *   To test the system, ensure that both the Flask server (from step 1) and the TypeScript React app (from step 2) are running.
 *   Use the React frontend to interact with the system and submit data. The Flask server will handle the machine learning processing in the background.
@@ -56,6 +89,7 @@ This is a machine learning-based concussion detection and athletic training soft
 ### ML Model
 
 The ML model used in this project analyzes eye-tracking data (patients' X and Y coordinates) to assess concussion likelihood. It is integrated into the Flask backend and provides real-time results based on user inputs from the frontend.
+
 
 ### Notes
 
