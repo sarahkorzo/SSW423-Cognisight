@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import React, { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -12,10 +10,14 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
+import { useAuth } from "@/context/AuthContext"
+import axios from "axios"
 
 export default function SignUpPage() {
   const router = useRouter()
   const { toast } = useToast()
+  const { login } = useAuth()
+
   const [imageUrl, setImageUrl] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     name: "",
@@ -36,17 +38,48 @@ export default function SignUpPage() {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    // Here you would typically send the registration data to your backend
-    console.log("Registration data:", { ...formData, imageUrl })
+    console.log("Register form submitted:", formData)
 
-    // Simulate successful registration
-    toast({
-      title: "Registration Successful",
-      description: "Welcome to Cognisight!",
-    })
-    router.push("/dashboard")
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/users/register",
+        {
+          username: formData.email,
+          password: formData.password,
+        },
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+
+      if (res.status === 201) {
+        setTimeout(async () => {
+          await login()
+
+          toast({
+            title: "Registration Successful",
+            description: "Welcome to Cognisight!",
+          })
+
+          router.push("/dashboard")
+        }, 300)
+      } else {
+        throw new Error("Unexpected response")
+      }
+    } catch (err: any) {
+      console.error("Registration failed:", err)
+
+      toast({
+        title: "Registration Failed",
+        description: err?.response?.data?.error || "Something went wrong",
+        variant: "destructive",
+      })
+    }
   }
 
   return (
@@ -75,15 +108,27 @@ export default function SignUpPage() {
                 className="block w-32 h-32 rounded-full bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer overflow-hidden"
               >
                 {imageUrl ? (
-                  <Image src={imageUrl || "/placeholder.svg"} alt="Profile" fill className="object-cover" />
+                  <Image
+                    src={imageUrl}
+                    alt="Profile"
+                    fill
+                    className="object-cover"
+                  />
                 ) : (
                   <Plus className="w-8 h-8 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-slate-400" />
                 )}
               </label>
-              <input type="file" id="profile-image" accept="image/*" onChange={handleImageUpload} className="hidden" />
+              <input
+                type="file"
+                id="profile-image"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
             </div>
           </div>
 
+          {/* Form Fields */}
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -125,7 +170,7 @@ export default function SignUpPage() {
               <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
-                type="tel"
+                type="password"
                 placeholder="Enter your password"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -149,4 +194,3 @@ export default function SignUpPage() {
     </div>
   )
 }
-

@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import React, { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
@@ -11,29 +9,93 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
+import { useAuth } from "@/context/AuthContext"
+import axios from "axios"
 
 export default function LoginPage() {
   const router = useRouter()
   const { toast } = useToast()
+  const { login } = useAuth()
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   })
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    // Here you would typically validate credentials with your backend
-    console.log("Login attempt:", formData)
+    console.log("Login form submitted:", formData)
 
-    // Save user email to localStorage for player database association
-    localStorage.setItem("userEmail", formData.email)
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/users/login",
+        {
+          username: formData.email,
+          password: formData.password,
+        },
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
 
-    // Simulate successful login
-    toast({
-      title: "Login Successful",
-      description: "Welcome back to Cognisight!",
-    })
-    router.push("/dashboard")
+      if (res.status === 200) {
+        // Small delay for cookies to register
+        setTimeout(async () => {
+          await login()
+          toast({
+            title: "Login Successful",
+            description: "Welcome back to Cognisight!",
+          })
+          router.push("/dashboard")
+        }, 300)
+      } else {
+        throw new Error("Unexpected response")
+      }
+    } catch (err: any) {
+      console.error("Login failed:", err)
+    
+      const status = err?.response?.status
+      const raw = err?.response?.data
+      const fallbackMessage = typeof raw === "string" ? raw : "Invalid login. Please try again."
+    
+      if (status === 400) {
+        toast({
+          title: "Invalid Login",
+          description: fallbackMessage,
+          variant: "destructive",
+        })
+      } else if (status === 404) {
+        toast({
+          title: "Account Not Found",
+          description: "This email is not registered. Would you like to sign up?",
+          variant: "destructive",
+          action: (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => router.push("/signup")}
+            >
+              Sign Up
+            </Button>
+          ),
+        })
+      } else if (status === 401) {
+        toast({
+          title: "Incorrect Credentials",
+          description: "The password or email you entered is incorrect.",
+          variant: "destructive",
+        })
+      } else {
+        toast({
+          title: "Login Failed",
+          description: fallbackMessage,
+          variant: "destructive",
+        })
+      }
+    }
   }
 
   return (
@@ -62,7 +124,9 @@ export default function LoginPage() {
                 type="email"
                 placeholder="Enter your email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
                 required
               />
             </div>
@@ -74,7 +138,9 @@ export default function LoginPage() {
                 type="password"
                 placeholder="Enter your password"
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
                 required
               />
             </div>
@@ -95,4 +161,3 @@ export default function LoginPage() {
     </div>
   )
 }
-
