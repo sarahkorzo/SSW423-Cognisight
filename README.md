@@ -25,60 +25,87 @@ This is a machine learning-based concussion detection and athletic training soft
     This will start the Flask server, which is responsible for handling API requests related to the concussion detection model.
     
 
-#### 2\. Run Frontend Locally
+#### 2\. Set Up MongoDB
 
-*   In the project root directory, navigate to the `client` folder (or wherever the TypeScript React app is located).
-    
-*   Install the required dependencies:
-    
-    bash
-    
-    CopyEdit
-    
-    `npm install`
-    
-*   After the dependencies are installed, run the development server:
-    
-    bash
-    
-    CopyEdit
-    
-    `npm run dev`
-    
-    This will start the React app locally on `http://localhost:3000`.
+Option 1: MongoDB Atlas (Recommended)
 
-    
-#### 3\. User Authentication Backend (Node.js + MongoDB + JWT)
+*   Go to MongoDB Atlas
 
-This project includes a secure login and registration system for trainers using MongoDB and JSON Web Tokens (JWT). This enables protected access to sensitive features like player directories and concussion results.
+    Create a free account
 
-*   Install Backend Dependencies
-    Navigate to the `/server` folder.
-    Run the following command to install required packages:
+    Create a free cluster
 
-    `npm install`
+    Create a Database User (username + password)
 
-*   Create the `.env` File
+    Set Network Access to Allow Access from Anywhere (0.0.0.0/0)
 
-    In the `/server` directory, create a `.env` file with the following keys:
+    Click Connect → Connect your application → Copy the connection string.
 
-    ```
-    MONGO_URL=mongodb+srv://<your-username>:<your-password>@<your-cluster>.mongodb.net
-    MONGO_DB=cognisight
-    JWT_SECRET=your-super-secret-key
-    ```
+*   Example connection string:
 
-    You can use the provided `.env.example` file as a reference.
+**mongodb+srv://<username>:<password>@cluster0.mongodb.net/cognisight?retryWrites=true&w=majority**
 
-*   Run the Backend Server
 
-    In the `/server` folder, run the following command to start the backend:
 
-    `npm run dev`
+Option 2: Local MongoDB (Optional)
 
-    This will start the Node.js server on `http://localhost:5000`.
+*   Download MongoDB Community Edition from here
 
-These setup steps enable secure login and sign-up functionality using MongoDB and JWT, which will protect access to future features like player data and concussion assessments.
+*   Install and run the local Mongo server:
+
+mongod
+
+*   Local connection string:
+
+**mongodb://localhost:27017/cognisight**
+
+#### 3\. Set Up the Backend Server
+
+*   Navigate to the /server folder.
+
+*   Install backend dependencies:
+
+npm install
+
+*   Create a .env file in the /server directory with the following keys:
+
+MONGO_URI=<your-mongo-connection-string>
+JWT_SECRET=yourSuperSecretKey
+PORT=5000
+
+Example:
+
+MONGO_URI=mongodb+srv://trainer:password@cluster0.mongodb.net/cognisight?retryWrites=true&w=majority
+JWT_SECRET=supersecretkey123
+PORT=5000
+
+*   Start the backend server:
+
+npm run dev
+
+This will start the Node.js server on http://localhost:5000.
+
+#### 4\. Set Up the Frontend Client
+
+*   Navigate to the /client folder.
+
+    Install frontend dependencies:
+
+npm install
+
+*   Start the Next.js development server:
+
+npm run dev
+
+This will run the React app locally on http://localhost:3000.
+
+#### 5\. Access the App
+
+*   Open your browser and go to:
+
+**http://localhost:3000**
+
+*   Login, create players, run concussion assessments, and manage teams directly from the app.
 
 
 #### 4\. Testing
@@ -90,11 +117,24 @@ These setup steps enable secure login and sign-up functionality using MongoDB an
 
 The ML model used in this project analyzes eye-tracking data (patients' X and Y coordinates) to assess concussion likelihood. It is integrated into the Flask backend and provides real-time results based on user inputs from the frontend.
 
+### User Authentication System (Node.js + MongoDB + JWT)
+
+Cognisight includes a secure login and registration system for athletic trainers:
+
+MongoDB is used for storing user accounts.
+
+JWT tokens are used for secure session management.
+
+Protected routes ensure that only authenticated users can access sensitive data (players, tests, organizations).
+
 
 ### Notes
 
 *   The software is currently in development, and some functionality may be experimental.
 *   Make sure both the backend (Flask) and frontend (React) are running simultaneously to ensure proper interaction between the two.
+*   Make sure both the frontend and backend servers are running simultaneously.
+*   Ensure MongoDB server or MongoDB Atlas cluster is available.
+*   Create a proper .env file inside /server/ before running the backend.
 
 ### Contributing
 
