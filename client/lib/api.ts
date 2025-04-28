@@ -16,24 +16,16 @@ export const fetchPlayers = async () => {
 };
 
 export const createPlayer = async (playerData: any) => {
-    const res = await API.post("/players", playerData);
-    return res.data;
+  const res = await API.post("/players", playerData);
+  return res.data;
 };
 
 export const createOrganization = async (orgData: { name: string }) => {
-  const res = await axios.post(
-    "http://localhost:5000/api/organizations",
-    orgData,
-    { withCredentials: true }
-  );
+  const res = await API.post("/organizations", orgData);
   return res.data;
 };
 
 export async function updatePlayer(playerId: string, updatedData: any) {
-  const res = await axios.patch(
-    `http://localhost:5000/api/players/${playerId}`,
-    updatedData,
-    { withCredentials: true }
-  );
+  const res = await API.put(`/players/${playerId}`, updatedData);
   return res.data;
 }

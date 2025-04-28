@@ -197,7 +197,13 @@ function InputBlock({ id, label, value, onChange, required = false, type = "text
   return (
     <div className="space-y-2">
       <Label htmlFor={id}>{label}</Label>
-      <Input id={id} value={value || ""} onChange={onChange} required={required} type={type} />
+      <Input
+        id={id}
+        value={typeof value === "string" || typeof value === "number" ? value : ""}
+        onChange={onChange}
+        required={required}
+        type={type}
+      />
     </div>
   );
 }

@@ -80,13 +80,21 @@ export default function PlayerDatabasePage() {
             </Button>
           </div>
           <h1 className="text-3xl font-bold text-slate-800 text-center">Player Database</h1>
-          <div className="flex justify-end">
+          <div className="flex flex-col items-end space-y-2">
+
             <Button className="bg-blue-700 hover:bg-blue-800 text-white hidden md:flex items-center gap-2" asChild>
               <Link href="/players/add">
                 <Plus className="h-4 w-4" />
                 Add New Player
               </Link>
             </Button>
+
+            <Button className="bg-green-700 hover:bg-green-800 text-white hidden md:flex items-center gap-2" asChild>
+              <Link href="/organizations/add">
+                <Plus className="h-4 w-4" />
+                Add New Team
+              </Link>
+            </Button>   
           </div>
         </header>
 
