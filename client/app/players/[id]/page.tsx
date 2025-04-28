@@ -25,7 +25,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { useToast } from "@/components/ui/use-toast"
-import { playerData, type Player } from "../data"
+import { fetchPlayers } from "@/lib/api"
+import { Player } from "../data"
 
 export default function PlayerProfilePage({ params }: { params: { id: string } }) {
   const router = useRouter()
@@ -36,34 +37,34 @@ export default function PlayerProfilePage({ params }: { params: { id: string } }
 
   // Load player data
   useEffect(() => {
-    // First check pre-defined players
-    let foundPlayer = playerData.find((p) => p.id === params.id)
-
-    // If not found, check user-added players
-    if (!foundPlayer) {
-      const userEmail = localStorage.getItem("userEmail")
-      if (userEmail) {
-        const savedPlayers = localStorage.getItem(`players_${userEmail}`)
-        if (savedPlayers) {
-          const parsedPlayers = JSON.parse(savedPlayers) as Player[]
-          foundPlayer = parsedPlayers.find((p) => p.id === params.id)
+    const loadPlayer = async () => {
+      try {
+        const players = await fetchPlayers();
+        const foundPlayer = players.find((p: any) => p._id === params.id);
+  
+        if (foundPlayer) {
+          setPlayer(foundPlayer);
+          setEditedPlayer(JSON.parse(JSON.stringify(foundPlayer)));
+        } else {
+          toast({ title: "Player not found", variant: "destructive" });
+          router.push("/players");
         }
+      } catch (err) {
+        console.error("Failed to load player", err);
+        toast({ title: "Error loading player", variant: "destructive" });
+        router.push("/players");
       }
-    }
-
-    if (foundPlayer) {
-      setPlayer(foundPlayer)
-      setEditedPlayer(JSON.parse(JSON.stringify(foundPlayer))) // Deep copy
-    } else {
-      router.push("/players")
-    }
-  }, [params.id, router])
+    };
+  
+    loadPlayer();
+  }, [params.id, router, toast]);  
+  
 
   if (!player || !editedPlayer) {
     return null // Loading state
   }
 
-  const isUserAddedPlayer = player.id.startsWith("user_")
+  const isUserAddedPlayer = typeof player.id === "string" && player.id.startsWith("user_");
 
   const statusConfig = {
     active: { label: "Active", variant: "outline" as const, color: "text-green-600" },
@@ -75,25 +76,29 @@ export default function PlayerProfilePage({ params }: { params: { id: string } }
   const statusInfo = statusConfig[player.status]
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { id, value } = e.target
-
+    const { id, value } = e.target;
+  
+    if (!editedPlayer) return; // extra safety
+  
     if (id.includes(".")) {
-      // Handle nested properties like contactInfo.email
-      const [parent, child] = id.split(".")
+      const [parent, child] = id.split(".");
+      const parentData = editedPlayer[parent as keyof Player] || {}; // fallback to empty object
+  
       setEditedPlayer({
         ...editedPlayer,
         [parent]: {
-          ...editedPlayer[parent as keyof Player],
+          ...(typeof parentData === "object" ? parentData : {}), // ensure it's an object
           [child]: value,
         },
-      })
+      });
     } else {
       setEditedPlayer({
         ...editedPlayer,
         [id]: value,
-      })
+      });
     }
-  }
+  };
+  
 
   const handleSelectChange = (value: string, field: string) => {
     setEditedPlayer({
@@ -195,10 +200,13 @@ export default function PlayerProfilePage({ params }: { params: { id: string } }
               </>
             ) : (
               <>
-                <Button variant="outline" className="gap-2" onClick={() => setIsEditing(true)}>
-                  <Edit className="h-4 w-4" />
-                  Edit
-                </Button>
+                <Link href={`/players/edit/${player.id}`}>
+                  <Button variant="outline" className="gap-2">
+                    <Edit className="h-4 w-4" />
+                    Edit
+                   </Button>
+                </Link>
+
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="destructive" className="gap-2">
@@ -284,85 +292,45 @@ export default function PlayerProfilePage({ params }: { params: { id: string } }
               </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-2">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-2">
+              {/* Age */}
               <div>
-                  <p className="text-sm text-slate-500">Date of Birth</p>
-                  {isEditing ? (
-                    <Input id="dob" type="number" value={editedPlayer.dob} onChange={handleInputChange} />
-                  ) : (
-                    <p className="font-medium">{player.dob}</p>
-                  )}
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">Age</p>
-                  {isEditing ? (
-                    <Input id="age" type="number" value={editedPlayer.age} onChange={handleInputChange} />
-                  ) : (
-                    <p className="font-medium">{player.age} years</p>
-                  )}
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">Height</p>
-                  {isEditing ? (
-                    <Input id="height" value={editedPlayer.height} onChange={handleInputChange} />
-                  ) : (
-                    <p className="font-medium">{player.height}</p>
-                  )}
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">Weight</p>
-                  {isEditing ? (
-                    <Input id="weight" value={editedPlayer.weight} onChange={handleInputChange} />
-                  ) : (
-                    <p className="font-medium">{player.weight}</p>
-                  )}
-                </div>
+                <p className="text-sm text-slate-500">Age</p>
+                <p className="font-medium">{player.age ? `${player.age} years` : "N/A"}</p>
               </div>
 
-              <Separator className="my-4" />
-
-              <div className="space-y-3">
-                <h3 className="font-semibold">Contact Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-slate-500">Email</p>
-                    {isEditing ? (
-                      <Input
-                        id="contactInfo.email"
-                        type="email"
-                        value={editedPlayer.contactInfo.email}
-                        onChange={handleInputChange}
-                      />
-                    ) : (
-                      <p className="font-medium">{player.contactInfo.email}</p>
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-sm text-slate-500">Phone</p>
-                    {isEditing ? (
-                      <Input
-                        id="contactInfo.phone"
-                        value={editedPlayer.contactInfo.phone}
-                        onChange={handleInputChange}
-                      />
-                    ) : (
-                      <p className="font-medium">{player.contactInfo.phone}</p>
-                    )}
-                  </div>
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">Emergency Contact</p>
-                  {isEditing ? (
-                    <Input
-                      id="contactInfo.emergency"
-                      value={editedPlayer.contactInfo.emergency}
-                      onChange={handleInputChange}
-                    />
-                  ) : (
-                    <p className="font-medium">{player.contactInfo.emergency}</p>
-                  )}
-                </div>
+              {/* Height */}
+              <div>
+                <p className="text-sm text-slate-500">Height</p>
+                <p className="font-medium">{player.height || "N/A"}</p>
               </div>
+
+              {/* Weight */}
+              <div>
+                <p className="text-sm text-slate-500">Weight</p>
+                <p className="font-medium">{player.weight || "N/A"}</p>
+              </div>
+
+              {/* Email */}
+              <div>
+                <p className="text-sm text-slate-500">Email</p>
+                <p className="font-medium">{player.contactInfo?.email || "N/A"}</p>
+              </div>
+
+              {/* Phone */}
+              <div>
+                <p className="text-sm text-slate-500">Phone</p>
+                <p className="font-medium">{player.contactInfo?.phone || "N/A"}</p>
+              </div>
+
+              {/* Emergency Contact */}
+              <div>
+                <p className="text-sm text-slate-500">Emergency Contact</p>
+                <p className="font-medium">{player.contactInfo?.emergency || "N/A"}</p>
+              </div>
+            </div>
+
+
             </CardContent>
           </Card>
 
@@ -383,31 +351,31 @@ export default function PlayerProfilePage({ params }: { params: { id: string } }
               )}
             </CardHeader>
             <CardContent>
-              {player.medicalHistory.length > 0 ? (
-                <div className="space-y-6">
-                  {player.medicalHistory.map((record, index) => (
-                    <div key={index} className="border rounded-lg p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-slate-500" />
-                          <span className="text-slate-600">{record.date}</span>
-                        </div>
-                        <SeverityBadge severity={record.severity} />
+            {player.medicalHistory && player.medicalHistory.length > 0 ? (
+              <div className="space-y-6">
+                {player.medicalHistory.map((record, index) => (
+                  <div key={index} className="border rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-slate-500" />
+                        <span className="text-slate-600">{record.date}</span>
                       </div>
-                      <h4 className="font-semibold text-lg mb-2">{record.incident}</h4>
-                      <p className="text-slate-700 mb-3">{record.notes}</p>
-                      {record.returnToPlay && (
-                        <div className="flex items-center gap-2 text-green-600">
-                          <span className="text-sm font-medium">Return to Play: {record.returnToPlay}</span>
-                        </div>
-                      )}
+                      <SeverityBadge severity={record.severity} />
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-slate-500">No medical history recorded</p>
-                </div>
+                    <h4 className="font-semibold text-lg mb-2">{record.incident}</h4>
+                    <p className="text-slate-700 mb-3">{record.notes}</p>
+                    {record.returnToPlay && (
+                      <div className="flex items-center gap-2 text-green-600">
+                        <span className="text-sm font-medium">Return to Play: {record.returnToPlay}</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-slate-500">No medical history recorded</p>
+              </div>
               )}
             </CardContent>
           </Card>

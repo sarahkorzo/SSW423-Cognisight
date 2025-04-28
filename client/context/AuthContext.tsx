@@ -6,7 +6,8 @@ import axios from "axios";
 interface AuthContextType {
   user: string | null;
   loading: boolean;
-  login: () => Promise<void>;
+  error: string | null;
+  login: () => Promise<void>; // No parameters
   logout: () => Promise<void>;
 }
 
@@ -15,6 +16,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Check auth status on first load
   useEffect(() => {
@@ -24,8 +26,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           withCredentials: true,
         });
         setUser(res.data.username);
+        setError(null);
       } catch (err) {
         setUser(null);
+        setError("Failed to authenticate");
       } finally {
         setLoading(false);
       }
@@ -40,8 +44,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         withCredentials: true,
       });
       setUser(res.data.username);
+      setError(null);
     } catch (err) {
       setUser(null);
+      setError("Failed to authenticate");
     }
   };
 
@@ -51,14 +57,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         withCredentials: true,
       });
     } catch (err) {
-      console.error("Logout failed", err);
+      setError("Failed to logout");
     } finally {
       setUser(null);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, error, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

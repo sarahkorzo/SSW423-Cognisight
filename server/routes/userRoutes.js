@@ -6,8 +6,8 @@ import User from "../models/User.js";
 const router = express.Router();
 
 // Helper to create JWT
-const createToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "3d" });
+const createToken = (_id) => {
+  return jwt.sign({ _id }, process.env.JWT_SECRET, { expiresIn: "3d" });
 };
 
 // ===== REGISTER =====
@@ -84,9 +84,9 @@ router.get("/check-auth", async (req, res) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id).select("username");
+    const user = await User.findById(decoded._id).select("username");
     if (!user) {
-      console.log("User not found for token:", decoded.id);
+      console.log("User not found for token:", decoded._id);
       return res.status(401).json({ error: "Invalid token" });
     }
 

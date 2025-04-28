@@ -23,9 +23,9 @@ export default function LoginPage() {
   })
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    console.log("Login form submitted:", formData)
-
+    e.preventDefault();
+    console.log("Login form submitted:", formData);
+  
     try {
       const res = await axios.post(
         "http://localhost:5000/api/users/login",
@@ -39,64 +39,61 @@ export default function LoginPage() {
             "Content-Type": "application/json",
           },
         }
-      )
-
+      );
+  
       if (res.status === 200) {
-        // Small delay for cookies to register
-        setTimeout(async () => {
-          await login()
-          toast({
-            title: "Login Successful",
-            description: "Welcome back to Cognisight!",
-          })
-          router.push("/dashboard")
-        }, 300)
+        await login(); //Immediately after success
+        toast({
+          title: "Login Successful",
+          description: "Welcome back to Cognisight!",
+        });
+        router.push("/dashboard"); //Immediately after login refresh
       } else {
-        throw new Error("Unexpected response")
+        throw new Error("Unexpected response");
       }
     } catch (err: any) {
-      console.error("Login failed:", err)
-    
-      const status = err?.response?.status
-      const raw = err?.response?.data
-      const fallbackMessage = typeof raw === "string" ? raw : "Invalid login. Please try again."
-    
+      console.error("Login failed:", err);
+  
+      const status = err?.response?.status;
+      const raw = err?.response?.data;
+      const fallbackMessage = typeof raw === "string" ? raw : "Invalid login. Please try again.";
+  
       if (status === 400) {
         toast({
           title: "Invalid Login",
           description: fallbackMessage,
           variant: "destructive",
-        })
+        });
       } else if (status === 404) {
         toast({
           title: "Account Not Found",
           description: "This email is not registered. Would you like to sign up?",
           variant: "destructive",
           action: (
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => router.push("/signup")}
             >
               Sign Up
             </Button>
           ),
-        })
+        });
       } else if (status === 401) {
         toast({
           title: "Incorrect Credentials",
           description: "The password or email you entered is incorrect.",
           variant: "destructive",
-        })
+        });
       } else {
         toast({
           title: "Login Failed",
           description: fallbackMessage,
           variant: "destructive",
-        })
+        });
       }
     }
-  }
+  };  
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">

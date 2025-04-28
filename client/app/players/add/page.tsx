@@ -1,29 +1,28 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { ArrowLeft, Save } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useToast } from "@/components/ui/use-toast"
-import type { Player } from "../data"
+import type React from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft, Save } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/components/ui/use-toast";
+import { createPlayer, fetchOrganizations } from "@/lib/api"; //Only real API calls
 
 export default function AddPlayerPage() {
-  const router = useRouter()
-  const { toast } = useToast()
+  const router = useRouter();
+  const { toast } = useToast();
 
   const [formData, setFormData] = useState({
     name: "",
     dob: "",
     age: "",
-    team: "",
-    trainerName: "",
+    team: "", // Will store organizationId
     status: "active",
     height: "",
     weight: "",
@@ -31,88 +30,77 @@ export default function AddPlayerPage() {
     phone: "",
     emergency: "",
     medicalNotes: "",
-    mentalHealthReferrals: [],
-    surgicalHistory: [],
-    allergies: [],
-    bloodwork: [],
-    medication: []
-  })
+  });
+
+  const [organizations, setOrganizations] = useState<{ _id: string; name: string }[]>([]);
+
+  useEffect(() => {
+    const loadOrgs = async () => {
+      try {
+        const orgs = await fetchOrganizations();
+        setOrganizations(orgs);
+      } catch (err) {
+        console.error("Failed to load organizations", err);
+      }
+    };
+
+    loadOrgs();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { id, value } = e.target
-    setFormData((prev) => ({ ...prev, [id]: value }))
-  }
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
 
   const handleSelectChange = (value: string, field: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
-    if (!formData.name || !formData.team || !formData.trainerName) {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+  
+    if (!formData.name || !formData.team) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields.",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
-
-    // Get user email from localStorage (from login)
-    const userEmail = localStorage.getItem("userEmail") || "demo@cognisight.com"
-
-    // Create a new player object
-    const newPlayer: Player = {
-      id: `user_${Date.now()}`, // Generate a unique ID
-      name: formData.name,
-      dob: formData.dob,
-      age: Number.parseInt(formData.age) || 0,
-      team: formData.team,
-      trainerName: formData.trainerName,
-      status: formData.status as "active" | "injured" | "concussion" | "recovery",
-      height: formData.height || "Not specified",
-      weight: formData.weight || "Not specified",
-      medicalHistory: formData.medicalNotes
-        ? [
-            {
-              date: new Date().toISOString().split("T")[0],
-              incident: "Initial Medical Notes",
-              severity: "mild",
-              notes: formData.medicalNotes,
-            },
-          ]
-        : [],
-      contactInfo: {
-        email: formData.email || "Not provided",
-        phone: formData.phone || "Not provided",
-        emergency: formData.emergency || "Not provided",
-      },
-      mentalHealthReferrals: formData.mentalHealthReferrals,
-      surgicalHistory: formData.surgicalHistory,
-      allergies: formData.allergies,
-      bloodwork: formData.bloodwork,
-      medication: formData.medication,
+  
+    try {
+      await createPlayer({
+        name: formData.name,
+        dob: formData.dob,
+        age: formData.age,
+        profilePicUrl: "https://example.com/default-player.png",
+        address: { street: "Unknown", city: "Unknown", zip: "Unknown" },
+        height: formData.height,
+        weight: formData.weight,
+        email: formData.email,
+        phone: formData.phone,
+        emergency: formData.emergency,
+        organizationId: formData.team,
+        status: formData.status,
+      });
+      
+  
+      toast({
+        title: "Player Added!",
+        description: `${formData.name} has been added to your database.`,
+      });
+  
+      router.push("/players");
+    } catch (error) {
+      console.error("Failed to add player", error);
+      toast({
+        title: "Failed to Add Player",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
     }
-
-    // Get existing user-added players or initialize empty array
-    const existingPlayers = JSON.parse(localStorage.getItem(`players_${userEmail}`) || "[]")
-
-    // Add new player to the array
-    const updatedPlayers = [...existingPlayers, newPlayer]
-
-    // Save updated array back to localStorage
-    localStorage.setItem(`players_${userEmail}`, JSON.stringify(updatedPlayers))
-
-    // Show success message
-    toast({
-      title: "Player Added",
-      description: `${newPlayer.name} has been added to your database.`,
-    })
-
-    // Navigate back to player database
-    router.push("/players")
-  }
+  };
+  
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -134,10 +122,10 @@ export default function AddPlayerPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-8">
-              {/* Basic Information */}
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Basic Information</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
                   <div className="space-y-2">
                     <Label htmlFor="name">Full Name *</Label>
                     <Input
@@ -148,16 +136,18 @@ export default function AddPlayerPage() {
                       required
                     />
                   </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="dob">Date of Birth *</Label>
                     <Input
                       id="dob"
-                      placeholder="yyyy-mm-dd"
+                      placeholder="mm-dd-yyyy"
                       value={formData.dob}
                       onChange={handleInputChange}
                       required
                     />
                   </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="age">Age *</Label>
                     <Input
@@ -169,35 +159,17 @@ export default function AddPlayerPage() {
                       required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="team">Team *</Label>
-                    <Input
-                      id="team"
-                      placeholder="Enter player's team"
-                      value={formData.team}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="trainerName">Trainer Name *</Label>
-                    <Input
-                      id="trainerName"
-                      placeholder="Enter player's team trainer"
-                      value={formData.trainerName}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="height">Height</Label>
                     <Input
                       id="height"
-                      placeholder="e.g. 6'2&quot;"
+                      placeholder="e.g. 6 ft 2 in"
                       value={formData.height}
                       onChange={handleInputChange}
                     />
                   </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="weight">Weight</Label>
                     <Input
@@ -207,9 +179,28 @@ export default function AddPlayerPage() {
                       onChange={handleInputChange}
                     />
                   </div>
+
+
+                  {/* Team Dropdown */}
+                  <div className="space-y-2">
+                    <Label htmlFor="team">Team *</Label>
+                    <Select value={formData.team} onValueChange={(value) => handleSelectChange(value, "team")}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a team" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {organizations.map((org) => (
+                          <SelectItem key={org._id} value={org._id}>
+                            {org.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                   <div className="space-y-2">
                     <Label>Status *</Label>
-                    <Select defaultValue="active" onValueChange={(value) => handleSelectChange(value, "status")}>
+                    <Select value={formData.status} onValueChange={(value) => handleSelectChange(value, "status")}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select player status" />
                       </SelectTrigger>
@@ -221,10 +212,11 @@ export default function AddPlayerPage() {
                       </SelectContent>
                     </Select>
                   </div>
+
                 </div>
               </div>
 
-              {/* Contact Information */}
+              {/* Contact Info and Medical Info */}
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Contact Information</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -252,27 +244,24 @@ export default function AddPlayerPage() {
                   <Label htmlFor="emergency">Emergency Contact</Label>
                   <Input
                     id="emergency"
-                    placeholder="Name and phone number of emergency contact"
+                    placeholder="Emergency contact name and number"
                     value={formData.emergency}
                     onChange={handleInputChange}
                   />
                 </div>
               </div>
 
-              {/* Medical Information */}
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Medical Information</h3>
                 <div className="space-y-2">
                   <Label htmlFor="medicalNotes">Initial Medical Notes</Label>
                   <Textarea
                     id="medicalNotes"
-                    placeholder="Enter any initial medical notes or history"
-                    className="min-h-[100px]"
+                    placeholder="Enter any initial medical notes"
                     value={formData.medicalNotes}
                     onChange={handleInputChange}
                   />
                 </div>
-                {/* Additional fields can be added here for mentalHealthReferrals, surgicalHistory, allergies, bloodwork, and medication */}
               </div>
 
               <div className="flex justify-end space-x-4 pt-4">
@@ -289,5 +278,5 @@ export default function AddPlayerPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

@@ -54,6 +54,7 @@ export default function DashboardPage() {
           <NavigationCard href="/players" icon={Database} title="Player Database" />
           <NavigationCard href="/testing/start" icon={Activity} title="Testing" />
           <NavigationCard href="/profile" icon={UserCircle} title="AT Profile" />
+          <NavigationCard href="/organizations/add" icon={Database} title="Add Organization" />
         </div>
       </div>
     </div>
